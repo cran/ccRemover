@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Martin Barron, Jun Li" />
+
+<meta name="date" content="2017-05-18" />
+
+<title>Identifying and removing the cell-cycle effect from single-cell RNA-Sequencing data - the ccRemover package</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Identifying and removing the cell-cycle effect from single-cell RNA-Sequencing data - the ccRemover package</h1>
+<h4 class="author"><em>Martin Barron, Jun Li</em></h4>
+<h4 class="date"><em>2017-05-18</em></h4>
+
+
+
+<p><strong>Abstract</strong></p>
+<p>Measurements of expression in single-cell RNA-Sequencing often suffer from a large systematic bias. A major source of this bias is the cell-cycle which introduces within-cell-type heterogeneity that can obscure the differences in expression between cell-types. The package <em>ccRemover</em> provides a method for identifying and removing the effects of the cell-cycle from single-cell RNA-Seq data. This vignette explains the use of the ccRemover r-package which implements the ccRemover algorithm Barron and Li <span class="citation">(2016)</span>.</p>
+<div id="preliminaries" class="section level2">
+<h2>1 Preliminaries</h2>
+<hr />
+<div id="normalized-data-matrix" class="section level3">
+<h3>1.1 Normalized Data Matrix</h3>
+<p>As input the ccRemover package expects a normalized, log-transformed and centered matrix of gene expression measurements for single cells obtained from single-cell RNA-Seq (scRNA-Seq) or another high-throughput sequencing experiment. The genes should correspond to the rows and the cells to the columns, that is the measurement in the <span class="math inline">\(i\)</span>-th row and the <span class="math inline">\(j\)</span>-th column of the matrix contains the expression of gene <span class="math inline">\(i\)</span> for cell <span class="math inline">\(j\)</span>.</p>
+<p>It is important that the data is normalized for sequencing depth prior to analysis or this may interfere with the identification of the cell-cycle components. From experience we have found that log-transforming the data prior to analysis leads to better results and more accurate cell-cycle removal. The data should be centered on a gene-by-gene basis, this prevents any small set of genes from dominating the principal components used to capture the cell-cycle effect.</p>
+<p>To demonstrate the preprocessing steps and the application of ccRemover we will use the differentiating T-helper cell data set that is presented as the first example in the original paper and was retrieved from the supplementary material of Buettner et al. <span class="citation">(2015)</span>. It was originally generated by Mahata B. et al. <span class="citation">(2014)</span> This data set contains normalized and log transformed gene expression measurements for 81 cells and 14,147 genes. First we must load the data into R.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(t.cell_data)</code></pre></div>
+<p>To check the data is in the appropriate format we can view the file with a text editor or use r.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(t.cell_data[,<span class="dv">1</span>:<span class="dv">5</span>])</code></pre></div>
+<pre><code>##        Cell 1  Cell 2  Cell 3  Cell 4 Cell 5
+## Gnai3 3.12560 0.86096 2.62610 3.25490 3.7152
+## Cdc45 3.09290 0.11331 3.51750 0.47994 2.5712
+## Narf  0.25414 0.00000 1.79130 0.00000 1.4729
+## Klf6  1.66590 3.00130 1.92170 1.93360 4.1109
+## Scmh1 0.25414 0.11331 0.00000 0.00000 1.7960
+## Wnt3  0.52967 0.27746 0.61211 0.60523 3.5357</code></pre>
+<p>Here the data has genes as rows and cells as columns which is as required for ccRemover. If you have data which is in the opposite format then it must be transposed prior to applying ccRemover. This data is also already normalized and log-transformed. Next we must check that the data has been centered on a gene-by-gene basis. This is easy to see from a summary of the row means.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(<span class="kw">apply</span>(t.cell_data,<span class="dv">1</span>, mean))</code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.0392  0.8990  1.5738  1.6202  2.2817  5.1372</code></pre>
+<p>This data is not centered as can be seen from the non-zero row means above. We will center this data on a gene-by-gene basis and then recheck the row means to ensure the data has been centered correctly. The mean values will also be stored so that they can be added back into the cleaned data matrix</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mean_gene_exp &lt;-<span class="st"> </span><span class="kw">rowMeans</span>(t.cell_data)
+t_cell_data_cen &lt;-<span class="st"> </span>t.cell_data -<span class="st"> </span>mean_gene_exp
+<span class="kw">summary</span>(<span class="kw">apply</span>(t_cell_data_cen,<span class="dv">1</span>,mean))</code></pre></div>
+<pre><code>##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+## -4.441e-16 -5.211e-17 -6.924e-19 -1.453e-18  4.661e-17  3.838e-16</code></pre>
+<p>From the summary of the row means we can see that the centering has been effective and the genes now have mean 0 (or very close to it).</p>
+</div>
+</div>
+<div id="the-cell-cycle-genes" class="section level2">
+<h2>1.2 The cell-cycle genes</h2>
+<p>In order to remove the cell-cycle effect from the data ccRemover uses sets of genes annotated to the cell-cycle and not annotated to the cell-cycle. ccRemover uses the set of genes which are not annotated to the cell-cycle to identify the main effects that are present in the data. It then uses the cell-cycle annotated genes to identify which of the effects are related to the cell-cycle before removing them.</p>
+<p>These genes can be identified using your own methods or using ccRemover’s built-in cell-cycle gene identifier. This information is entered into ccRemover as a vector of length <span class="math inline">\(n\)</span>, ‘if_cc’, where <span class="math inline">\(n\)</span> is the number of genes in the data matrix and ‘if_cc[i] == TRUE’ if gene <span class="math inline">\(i\)</span> is a gene annotated to the cell-cycle or ‘if_cc[i] == FALSE’ if gene <span class="math inline">\(i\)</span> is not annotated to the cell-cycle. In other words ‘if_cc’ is an indicator vector indicating whether a gene is a cell-cycle gene or not.</p>
+<p>If you are using ccRemover to remove another source of unwanted variation in the data that is not the cell-cycle then you will need to determine yourself which genes are effected by the feature which you are interested in removing. Thus the vector will have entries ‘if_cc[i] == TRUE’ if gene <span class="math inline">\(i\)</span> is affected by the feature of interest and ‘if_cc[i] == FALSE’ if gene <span class="math inline">\(i\)</span> is not affected by the feature of interest.</p>
+<p>To identify the cell-cycle genes in your own data set using ccRemovers built in function we recommend following the procedure below. First extract the gene names from the data matrix:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gene_names &lt;-<span class="st"> </span><span class="kw">rownames</span>(t_cell_data_cen)</code></pre></div>
+<p>Next we use ccRemovers built-in function to identify the indices of the cell-cycle genes from the data. This function requires the additional arguments ‘species’ and ‘name_type’, these arguments correspond to the species of the samples and the format of the gene ID’s respectively. Currently ccRemover is able to identify genes from Homo Sapiens (‘“human”’) and Mus Musculus (‘“mouse”’). In addition it is able to function using Ensembl Gene IDs (‘“ensembl”’), HGNC/MGI symbols (‘“symbol”’), Entrez Gene IDs (‘“entrez”’) and Unigene IDs (‘“unigene”’). If your gene ID’s are not in one of these formats then they must be converted prior to using ccRemover’s built-in gene indexer, Biomart provides a great data repository and user interface from which it is possible to download the data necessary for Gene ID conversion. If your names are of a different type but you have identified your own set of cell-cycle related genes and just need to use the main ccRemover function then ccRemover only needs to be provided with the vector described above and no ID conversion is necessary.</p>
+<p>This function identifies which of the gene names are annotated to the cell-cycle and returns a list of the indices of the cell-cycle genes. As the samples in this data set are from a mouse and the gene names are MGI symbols we select ‘species = “mouse”’ and ‘name_type = “symbols”’.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cell_cycle_gene_indices &lt;-<span class="st"> </span><span class="kw">gene_indexer</span>(gene_names, <span class="dt">species =</span> <span class="st">&quot;mouse&quot;</span>, 
+                                        <span class="dt">name_type =</span> <span class="st">&quot;symbols&quot;</span> )</code></pre></div>
+<pre><code>## Invalid name type input. Switching to NULLNo name format input.
+## Checking to see if match can be found:
+## Best guess is  symbol  IDs
+## 751  matches out of a possible  7073</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">length</span>(cell_cycle_gene_indices)</code></pre></div>
+<pre><code>## [1] 751</code></pre>
+<p>Here we have identified 751 of the 7,073 genes as cell-cycle related genes.</p>
+<p>Finally we must create the vector which will be used in the main ccRemover procedure. This step should be followed if you have calculated your own gene indices as well. Just sub in your own set of indices in place of ‘cell_cycle_gene_indices’ in the code below. We first create a vector of ‘FALSE’ values of length ‘n’ to store the values and then change the entries corresponding to the cell-cycle genes to ‘TRUE’. Finally we summarize the vector to ensure the correct number of cell-cycle genes has been assigned.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">if_cc &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="ot">FALSE</span>,<span class="kw">nrow</span>(t_cell_data_cen)) 
+if_cc[cell_cycle_gene_indices] &lt;-<span class="st"> </span><span class="ot">TRUE</span>
+<span class="kw">summary</span>(if_cc)</code></pre></div>
+<pre><code>##    Mode   FALSE    TRUE 
+## logical    6322     751</code></pre>
+<p>Here we see that there are 751 values of ‘TRUE’ in the ‘if_cc’ vector and 6,322 values of ‘FALSE’ as expected.</p>
+</div>
+<div id="putting-it-together" class="section level2">
+<h2>1.3 Putting it Together</h2>
+<p>Now that we have our normalized, centered and log-transformed data matrix along with our true/false vector indicating which genes are cell-cycle genes we must put them into a list prior to applying the main ccRemover function. The data matrix in the format described above should be saved as ‘x’ and the ‘if_cc’ vector should be saved as ‘if_cc’</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">x=</span>t_cell_data_cen, <span class="dt">if_cc=</span>if_cc)</code></pre></div>
+<p>Now we are ready to remove the cell-cycle effects from the data set.</p>
+</div>
+<div id="ccremover" class="section level1">
+<h1>2 ccRemover</h1>
+<hr />
+<div id="applying-ccremover" class="section level2">
+<h2>2.1 Applying ccRemover</h2>
+<p>Using the data list which has been created in the previous step we can now run ccRemover. Using the ‘if_cc’ vector ccRemover splits the data into two sets, the cell-cycle annotated genes and the genes not annotated to the cell-cycle, which we call the control genes. ccRemover identifies the main components of variation in the control genes using a simple principal components analysis. These are then compared with the cell-cycle genes to identify which of them are cell-cycle related. Finally the effect of the components identified as cell-cycle related is removed from the data. Please refer to the original manuscript for a detailed explanation of the method and examples of its application.</p>
+<p>As ccRemover runs it will print a table displaying the loadings of each component on the cell-cycle genes (xn.load), the control genes (xy.load), the difference between the two (diff.load) and the t-score for the difference in loading (t.load.boot) for each iteration. Those components which have a t-score greater than the cutoff (default value = 3) will be classified as cell-cycle effects and removed from the data.</p>
+<p>For this vigenette we turn off the progress bar, tracking the bootstrap repitions, as it does not work well with R-markdown.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xhat &lt;-<span class="st"> </span><span class="kw">ccRemover</span>(dat, <span class="dt">bar=</span><span class="ot">FALSE</span>)</code></pre></div>
+<pre><code>## 0.1061784  of genes are cell-cycle genes
+## Iteration  1 ...
+## Bootstrapping...The bootstrap results on the top 10 components are:      xn_load   xy_load   diff_load t_load_boot
+## PC1  4.764066 5.2458626  0.48179702   6.8332039
+## PC2  1.899494 1.9400189  0.04052475   0.7344238
+## PC3  1.307673 1.4149245  0.10725191   1.5852493
+## PC4  1.134286 1.3889111  0.25462511   2.1294349
+## PC5  1.108502 1.1296735  0.02117137   0.1639404
+## PC6  1.198600 1.1571330 -0.04146651  -0.4815290
+## PC7  1.076888 0.9899750 -0.08691289  -1.2459666
+## PC8  1.045047 0.9508303 -0.09421625  -1.2642564
+## PC9  1.209063 1.2256193  0.01655664   0.2016878
+## PC10 1.167671 1.2846210  0.11695048   1.5022964
+## The follow components are removed: 1
+## 
+## Iteration  2 ...
+## Bootstrapping...The bootstrap results on the top 10 components are:      xn_load   xy_load   diff_load t_load_boot
+## PC1  1.899494 1.9400189  0.04052475   0.8423022
+## PC2  1.307673 1.4149245  0.10725191   1.6715282
+## PC3  1.134286 1.3889111  0.25462511   1.9154297
+## PC4  1.108502 1.1296735  0.02117137   0.1899291
+## PC5  1.198600 1.1571330 -0.04146651  -0.3988762
+## PC6  1.076888 0.9899750 -0.08691289  -1.1013842
+## PC7  1.045047 0.9508303 -0.09421625  -1.2281061
+## PC8  1.209063 1.2256193  0.01655664   0.2211599
+## PC9  1.167671 1.2846210  0.11695048   1.5959189
+## PC10 1.009986 0.9815659 -0.02841966  -0.3845480
+## No more cell-cycle effect is detected.</code></pre>
+<p>For this data set we see that ccRemover identifies the first principal component as a cell-cycle effect on its first iteration (t.load.boot = 7.219). Once this component has been removed ccRemover does not identify any other cell-cycle effects present in the data on the second iteration. The ccRemover function outputs a transformed data matrix, ‘xhat’ which is free of cell-cycle effects. Further analysis can then be carried out on this data set with the confounding effects of the cell-cycle present. This can greatly improve the performance of clustering algorithms on the data.</p>
+<p>The final step here is to add the mean values back to the cleaned data matrix:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xhat &lt;-<span class="st"> </span>xhat +<span class="st"> </span>mean_gene_exp</code></pre></div>
+</div>
+<div id="settings" class="section level2">
+<h2>2.2 Settings</h2>
+<p>If you choose to run ccRemover not using the default settings the following options are available to you:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xhat &lt;-<span class="st"> </span><span class="kw">ccRemover</span>(dat, <span class="dt">cutoff =</span> <span class="dv">3</span>, <span class="dt">max_it =</span> <span class="dv">4</span>, <span class="dt">nboot =</span> <span class="dv">200</span>, <span class="dt">ntop =</span> <span class="dv">10</span>, <span class="dt">bar=</span><span class="ot">FALSE</span>)</code></pre></div>
+<pre><code>## 0.1061784  of genes are cell-cycle genes
+## Iteration  1 ...
+## Bootstrapping...The bootstrap results on the top 10 components are:      xn_load   xy_load   diff_load t_load_boot
+## PC1  4.764066 5.2458626  0.48179702   6.7168493
+## PC2  1.899494 1.9400189  0.04052475   0.5942648
+## PC3  1.307673 1.4149245  0.10725191   1.6282123
+## PC4  1.134286 1.3889111  0.25462511   1.8643167
+## PC5  1.108502 1.1296735  0.02117137   0.1695120
+## PC6  1.198600 1.1571330 -0.04146651  -0.4225163
+## PC7  1.076888 0.9899750 -0.08691289  -1.2155504
+## PC8  1.045047 0.9508303 -0.09421625  -1.3375192
+## PC9  1.209063 1.2256193  0.01655664   0.1937265
+## PC10 1.167671 1.2846210  0.11695048   1.4578687
+## The follow components are removed: 1
+## 
+## Iteration  2 ...
+## Bootstrapping...The bootstrap results on the top 10 components are:      xn_load   xy_load   diff_load t_load_boot
+## PC1  1.899494 1.9400189  0.04052475   0.7823143
+## PC2  1.307673 1.4149245  0.10725191   1.6728914
+## PC3  1.134286 1.3889111  0.25462511   1.8427596
+## PC4  1.108502 1.1296735  0.02117137   0.1731696
+## PC5  1.198600 1.1571330 -0.04146651  -0.4721461
+## PC6  1.076888 0.9899750 -0.08691289  -1.1529834
+## PC7  1.045047 0.9508303 -0.09421625  -1.1594292
+## PC8  1.209063 1.2256193  0.01655664   0.1983331
+## PC9  1.167671 1.2846210  0.11695048   1.6164931
+## PC10 1.009986 0.9815659 -0.02841966  -0.4041577
+## No more cell-cycle effect is detected.</code></pre>
+<ul>
+<li><p>The ‘cutoff’ is used to determine which of the effects are cell-cycle effects. The default and recommended value is 3, which roughly corresponds to a p-value of 0.01. For data sets which have very low levels of cell-cycle activity this value can be lowered to increase the detection of cell-cycle effects. Example 3 in the original manuscript was a case where a lower value of the cutoff was necessary.</p></li>
+<li><p>The ‘max.it’ value is the maximum number of iterations of the method. ccRemover will stop whenever it detects no more significant effects present in the data or it reaches its maximum number of iterations. The default value is 4 but we have found that for many data sets the cell-cycle effect will be effectively removed after 1 or 2 iterations.</p></li>
+<li><p>The ‘nboot’ value corresponds to the number of bootstrap repetitions carried out to test the significance of the components. Please refer to the methods section original manuscript for a detailed description of the estimation process. The default value is 200 and we have found this work effectively for most data sets.</p></li>
+<li><p>The ‘ntop’ parameter determines the number of principal components which are to be tested as cell-cycle effects upon each iteration. We have found that the default value of 10 works effectively for most data sets. However, for extremely diverse data sets within which there are expected to be many sources of variation this value could be raised so that all elements of the cell-cycle effect can be identified and removed.</p></li>
+</ul>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-barron16">
+<p>Barron, Martin, and Jun Li. 2016. “Identifying and Removing the Cell-Cycle Effect from Single-Cell RNA-Sequencing Data.” <em>Scientific Reports</em> 6 (September). doi:<a href="https://doi.org/10.1038/srep33892">10.1038/srep33892</a>.</p>
+</div>
+<div id="ref-buettner15">
+<p>Buettner, Florian, Kedar N. Natarajan, F. Paolo Casale, Valentina Proserpio, Antonio Scialdone, Fabian J. Theis, Sarah A. Teichmann, John C. Marioni, and Oliver Stegle. 2015. “Computational Analysis of Cell-to-Cell Heterogeneity in Single-Cell RNA-Sequencing Data Reveals Hidden Subpopulations of Cells.” <em>Nature Biotechnology</em> 33 (2). Nature Publishing Group: 155–60. doi:<a href="https://doi.org/10.1038/nbt.3102">10.1038/nbt.3102</a>.</p>
+</div>
+<div id="ref-mahata14">
+<p>Mahata, Bidesh, Xiuwei Zhang, Aleksandra A Kolodziejczyk, Valentina Proserpio, Liora Haim-Vilmovsky, Angela E Taylor, Daniel Hebenstreit, et al. 2014. “Single-Cell RNA Sequencing Reveals T Helper Cells Synthesizing Steroids De Novo to Contribute to Immune Homeostasis.” <em>Cell Reports</em> 7 (4): 1130–42. doi:<a href="https://doi.org/10.1016/j.celrep.2014.04.011">10.1016/j.celrep.2014.04.011</a>.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
