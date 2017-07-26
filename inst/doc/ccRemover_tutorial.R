@@ -1,6 +1,7 @@
 ## ----setup, include=FALSE------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 library(ccRemover)
+set.seed(10)
 
 ## ----load data1----------------------------------------------------------
 data(t.cell_data)

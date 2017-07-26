@@ -12,7 +12,7 @@
 
 <meta name="author" content="Martin Barron, Jun Li" />
 
-<meta name="date" content="2017-05-18" />
+<meta name="date" content="2017-07-25" />
 
 <title>Identifying and removing the cell-cycle effect from single-cell RNA-Sequencing data - the ccRemover package</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Identifying and removing the cell-cycle effect from single-cell RNA-Sequencing data - the ccRemover package</h1>
 <h4 class="author"><em>Martin Barron, Jun Li</em></h4>
-<h4 class="date"><em>2017-05-18</em></h4>
+<h4 class="date"><em>2017-07-25</em></h4>
 
 
 
@@ -145,38 +145,38 @@ if_cc[cell_cycle_gene_indices] &lt;-<span class="st"> </span><span class="ot">TR
 <div id="applying-ccremover" class="section level2">
 <h2>2.1 Applying ccRemover</h2>
 <p>Using the data list which has been created in the previous step we can now run ccRemover. Using the ‘if_cc’ vector ccRemover splits the data into two sets, the cell-cycle annotated genes and the genes not annotated to the cell-cycle, which we call the control genes. ccRemover identifies the main components of variation in the control genes using a simple principal components analysis. These are then compared with the cell-cycle genes to identify which of them are cell-cycle related. Finally the effect of the components identified as cell-cycle related is removed from the data. Please refer to the original manuscript for a detailed explanation of the method and examples of its application.</p>
-<p>As ccRemover runs it will print a table displaying the loadings of each component on the cell-cycle genes (xn.load), the control genes (xy.load), the difference between the two (diff.load) and the t-score for the difference in loading (t.load.boot) for each iteration. Those components which have a t-score greater than the cutoff (default value = 3) will be classified as cell-cycle effects and removed from the data.</p>
+<p>As ccRemover runs it will print a table displaying the loadings of each component on the control genes (xn.load), the cell-cycle genes (xy.load), the difference between the two (diff.load) and the t-score for the difference in loading (t.load.boot) for each iteration. Those components which have a t-score greater than the cutoff (default value = 3) will be classified as cell-cycle effects and removed from the data.</p>
 <p>For this vigenette we turn off the progress bar, tracking the bootstrap repitions, as it does not work well with R-markdown.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xhat &lt;-<span class="st"> </span><span class="kw">ccRemover</span>(dat, <span class="dt">bar=</span><span class="ot">FALSE</span>)</code></pre></div>
 <pre><code>## 0.1061784  of genes are cell-cycle genes
 ## Iteration  1 ...
 ## Bootstrapping...The bootstrap results on the top 10 components are:      xn_load   xy_load   diff_load t_load_boot
-## PC1  4.764066 5.2458626  0.48179702   6.8332039
-## PC2  1.899494 1.9400189  0.04052475   0.7344238
-## PC3  1.307673 1.4149245  0.10725191   1.5852493
-## PC4  1.134286 1.3889111  0.25462511   2.1294349
-## PC5  1.108502 1.1296735  0.02117137   0.1639404
-## PC6  1.198600 1.1571330 -0.04146651  -0.4815290
-## PC7  1.076888 0.9899750 -0.08691289  -1.2459666
-## PC8  1.045047 0.9508303 -0.09421625  -1.2642564
-## PC9  1.209063 1.2256193  0.01655664   0.2016878
-## PC10 1.167671 1.2846210  0.11695048   1.5022964
+## PC1  4.764066 5.2458626  0.48179702   7.1284190
+## PC2  1.899494 1.9400189  0.04052475   0.6857840
+## PC3  1.307673 1.4149245  0.10725191   1.6297520
+## PC4  1.134286 1.3889111  0.25462511   1.9128193
+## PC5  1.108502 1.1296735  0.02117137   0.1604851
+## PC6  1.198600 1.1571330 -0.04146651  -0.4073728
+## PC7  1.076888 0.9899750 -0.08691289  -1.1274758
+## PC8  1.045047 0.9508303 -0.09421625  -1.2408157
+## PC9  1.209063 1.2256193  0.01655664   0.2293425
+## PC10 1.167671 1.2846210  0.11695048   1.4449840
 ## The follow components are removed: 1
 ## 
 ## Iteration  2 ...
 ## Bootstrapping...The bootstrap results on the top 10 components are:      xn_load   xy_load   diff_load t_load_boot
-## PC1  1.899494 1.9400189  0.04052475   0.8423022
-## PC2  1.307673 1.4149245  0.10725191   1.6715282
-## PC3  1.134286 1.3889111  0.25462511   1.9154297
-## PC4  1.108502 1.1296735  0.02117137   0.1899291
-## PC5  1.198600 1.1571330 -0.04146651  -0.3988762
-## PC6  1.076888 0.9899750 -0.08691289  -1.1013842
-## PC7  1.045047 0.9508303 -0.09421625  -1.2281061
-## PC8  1.209063 1.2256193  0.01655664   0.2211599
-## PC9  1.167671 1.2846210  0.11695048   1.5959189
-## PC10 1.009986 0.9815659 -0.02841966  -0.3845480
+## PC1  1.899494 1.9400189  0.04052475   0.8398206
+## PC2  1.307673 1.4149245  0.10725191   1.4967569
+## PC3  1.134286 1.3889111  0.25462511   1.9382202
+## PC4  1.108502 1.1296735  0.02117137   0.1723988
+## PC5  1.198600 1.1571330 -0.04146651  -0.4817683
+## PC6  1.076888 0.9899750 -0.08691289  -1.2695125
+## PC7  1.045047 0.9508303 -0.09421625  -1.2992680
+## PC8  1.209063 1.2256193  0.01655664   0.2189583
+## PC9  1.167671 1.2846210  0.11695048   1.4874693
+## PC10 1.009986 0.9815659 -0.02841966  -0.4321327
 ## No more cell-cycle effect is detected.</code></pre>
-<p>For this data set we see that ccRemover identifies the first principal component as a cell-cycle effect on its first iteration (t.load.boot = 7.219). Once this component has been removed ccRemover does not identify any other cell-cycle effects present in the data on the second iteration. The ccRemover function outputs a transformed data matrix, ‘xhat’ which is free of cell-cycle effects. Further analysis can then be carried out on this data set with the confounding effects of the cell-cycle present. This can greatly improve the performance of clustering algorithms on the data.</p>
+<p>For this data set we see that ccRemover identifies the first principal component as a cell-cycle effect on its first iteration (t.load.boot = 7.13). Once this component has been removed ccRemover does not identify any other cell-cycle effects present in the data on the second iteration. The ccRemover function outputs a transformed data matrix, ‘xhat’ which is free of cell-cycle effects. Further analysis can then be carried out on this data set with the confounding effects of the cell-cycle present. This can greatly improve the performance of clustering algorithms on the data.</p>
 <p>The final step here is to add the mean values back to the cleaned data matrix:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xhat &lt;-<span class="st"> </span>xhat +<span class="st"> </span>mean_gene_exp</code></pre></div>
 </div>
@@ -187,30 +187,30 @@ if_cc[cell_cycle_gene_indices] &lt;-<span class="st"> </span><span class="ot">TR
 <pre><code>## 0.1061784  of genes are cell-cycle genes
 ## Iteration  1 ...
 ## Bootstrapping...The bootstrap results on the top 10 components are:      xn_load   xy_load   diff_load t_load_boot
-## PC1  4.764066 5.2458626  0.48179702   6.7168493
-## PC2  1.899494 1.9400189  0.04052475   0.5942648
-## PC3  1.307673 1.4149245  0.10725191   1.6282123
-## PC4  1.134286 1.3889111  0.25462511   1.8643167
-## PC5  1.108502 1.1296735  0.02117137   0.1695120
-## PC6  1.198600 1.1571330 -0.04146651  -0.4225163
-## PC7  1.076888 0.9899750 -0.08691289  -1.2155504
-## PC8  1.045047 0.9508303 -0.09421625  -1.3375192
-## PC9  1.209063 1.2256193  0.01655664   0.1937265
-## PC10 1.167671 1.2846210  0.11695048   1.4578687
+## PC1  4.764066 5.2458626  0.48179702   7.2438365
+## PC2  1.899494 1.9400189  0.04052475   0.7154375
+## PC3  1.307673 1.4149245  0.10725191   1.5429677
+## PC4  1.134286 1.3889111  0.25462511   1.8296309
+## PC5  1.108502 1.1296735  0.02117137   0.1681040
+## PC6  1.198600 1.1571330 -0.04146651  -0.4494239
+## PC7  1.076888 0.9899750 -0.08691289  -1.3333344
+## PC8  1.045047 0.9508303 -0.09421625  -1.3052767
+## PC9  1.209063 1.2256193  0.01655664   0.2126655
+## PC10 1.167671 1.2846210  0.11695048   1.4831892
 ## The follow components are removed: 1
 ## 
 ## Iteration  2 ...
 ## Bootstrapping...The bootstrap results on the top 10 components are:      xn_load   xy_load   diff_load t_load_boot
-## PC1  1.899494 1.9400189  0.04052475   0.7823143
-## PC2  1.307673 1.4149245  0.10725191   1.6728914
-## PC3  1.134286 1.3889111  0.25462511   1.8427596
-## PC4  1.108502 1.1296735  0.02117137   0.1731696
-## PC5  1.198600 1.1571330 -0.04146651  -0.4721461
-## PC6  1.076888 0.9899750 -0.08691289  -1.1529834
-## PC7  1.045047 0.9508303 -0.09421625  -1.1594292
-## PC8  1.209063 1.2256193  0.01655664   0.1983331
-## PC9  1.167671 1.2846210  0.11695048   1.6164931
-## PC10 1.009986 0.9815659 -0.02841966  -0.4041577
+## PC1  1.899494 1.9400189  0.04052475   0.8044851
+## PC2  1.307673 1.4149245  0.10725191   1.6110481
+## PC3  1.134286 1.3889111  0.25462511   1.9053519
+## PC4  1.108502 1.1296735  0.02117137   0.1646352
+## PC5  1.198600 1.1571330 -0.04146651  -0.4511874
+## PC6  1.076888 0.9899750 -0.08691289  -1.2669308
+## PC7  1.045047 0.9508303 -0.09421625  -1.2977739
+## PC8  1.209063 1.2256193  0.01655664   0.2083617
+## PC9  1.167671 1.2846210  0.11695048   1.4355563
+## PC10 1.009986 0.9815659 -0.02841966  -0.4007874
 ## No more cell-cycle effect is detected.</code></pre>
 <ul>
 <li><p>The ‘cutoff’ is used to determine which of the effects are cell-cycle effects. The default and recommended value is 3, which roughly corresponds to a p-value of 0.01. For data sets which have very low levels of cell-cycle activity this value can be lowered to increase the detection of cell-cycle effects. Example 3 in the original manuscript was a case where a lower value of the cutoff was necessary.</p></li>

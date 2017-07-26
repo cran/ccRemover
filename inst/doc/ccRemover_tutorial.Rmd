@@ -105,6 +105,7 @@ references:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ccRemover)
+set.seed(10)
 ```
 
 **Abstract**
@@ -297,7 +298,7 @@ Please refer to the original manuscript for a detailed explanation of the
 method and examples of its application. 
 
 As ccRemover runs it will print a table displaying the loadings of each
-component on the cell-cycle genes (xn.load), the control genes (xy.load),
+component on the control genes (xn.load), the cell-cycle genes (xy.load),
 the difference between the two (diff.load) and the t-score for the difference
 in loading (t.load.boot) for each iteration. Those components which have a
 t-score greater than the cutoff (default value = 3) will be classified as 
@@ -312,7 +313,7 @@ xhat <- ccRemover(dat, bar=FALSE)
 ```
 
 For this data set we see that ccRemover identifies the first principal 
-component as a cell-cycle effect on its first iteration (t.load.boot = 7.219).
+component as a cell-cycle effect on its first iteration (t.load.boot = 7.13).
 Once this component has been removed ccRemover does not identify any other 
 cell-cycle effects present in the data on the second iteration. 
 The ccRemover function outputs a transformed data matrix, 'xhat' which is 

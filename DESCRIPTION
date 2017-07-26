@@ -2,7 +2,7 @@ Package: ccRemover
 Type: Package
 Title: Removes the Cell-Cycle Effect from Single-Cell RNA-Sequencing
         Data
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(
     person("Jun", "Li", email = "jun.li@nd.edu",role = c("aut","cre")),
     person("Martin", "Barron", email = "mbarron2@nd.edu",role = c("aut")))
@@ -23,9 +23,9 @@ Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 Imports: stats, utils
 NeedsCompilation: no
-Packaged: 2017-05-18 05:11:03 UTC; Administrator
+Packaged: 2017-07-25 19:33:20 UTC; Administrator
 Author: Jun Li [aut, cre],
   Martin Barron [aut]
 Maintainer: Jun Li <jun.li@nd.edu>
 Repository: CRAN
-Date/Publication: 2017-05-18 13:48:53 UTC
+Date/Publication: 2017-07-26 15:39:07 UTC
