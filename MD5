@@ -1,6 +1,6 @@
-d667c02bfdc962a53f8e9f26a5ac9adb *DESCRIPTION
+37a138733fd8b83328279117027286a7 *DESCRIPTION
 df390c53434517b304ac5db487184641 *NAMESPACE
-f5f81fba3e699d27f71326f314e9f7d7 *R/ccRemover.R
+c08acb5ad78cec3030f85dd34e8e1d5d *R/ccRemover.R
 dc12a2d6231b8c4f01c597b3512598a2 *R/gene_indexer.R
 65655f3d4e8e2425b69ab5248c083be8 *R/hello.R
 98bc195232287298314ba064a698576f *build/vignette.rds
@@ -11,7 +11,7 @@ b10d313772beb4ae37803b635c5078c3 *data/MMcc_genes.RData
 657e3fb946ebdb0d595f738de25a3eee *data/t.cell_data.RData
 d752cad742702b2dd645468ce4f474ef *inst/doc/ccRemover_tutorial.R
 3616ba89d0ace36fe2d398eda03c35c0 *inst/doc/ccRemover_tutorial.Rmd
-81ac1779074c627120d5608c2468924e *inst/doc/ccRemover_tutorial.html
+17d8bde6e6b78cc04dc933f53c157ff8 *inst/doc/ccRemover_tutorial.html
 c8f6ff847ef185382acdb0a69149cdbf *man/HScc_genes.Rd
 eb7802d9dabd871c7960466b6912da03 *man/MMcc_genes.Rd
 cb3105206ceec8f0dd7074b76881748d *man/bootstrap_diff.Rd
